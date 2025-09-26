@@ -3,6 +3,19 @@ import { SUPABASE_URL, SUPABASE_KEY } from './config.js'
 
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY)
 
+
+// check session all'avvio e aggiorna UI
+(async () => {
+  const { data: { session } } = await sb.auth.getSession()
+  const logged = !!session?.user
+  loginBox.classList.toggle('hidden', logged)
+  btnToggleForm.classList.toggle('hidden', !logged)
+  btnLogout.classList.toggle('hidden', !logged)
+  userBadge.textContent = logged ? (session.user.email ?? 'utente') : ''
+})();
+
+
+
 // UI refs
 const tbody = document.querySelector('#tbl tbody')
 const status = document.getElementById('status')
