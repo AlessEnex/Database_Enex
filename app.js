@@ -231,12 +231,11 @@ tbody.addEventListener('click', async (e) => {
 
   // Permesso: può aggiornare solo l'autore (RLS)
   const { data: u } = await sb.auth.getUser()
-  const userId = u?.user?.id || null
-  const createdBy = tr.dataset.createdBy || null
-  if (!userId || userId !== createdBy) {
-    status.textContent = 'Non puoi modificare questa riga (non sei il creatore).'
-    return
-  }
+if (!u?.user) {
+  status.textContent = 'Devi essere loggato per modificare.'
+  return
+}
+
 
   // Meta colonna
   const meta = COLS.find(c => c.key === col)
