@@ -97,7 +97,9 @@ async function load() {
       <td data-col="notes">${fmt(r.notes)}</td>
       <td data-col="material_orders">${fmtDate(r.material_orders)}</td>
       <td data-col="owner">${fmt(r.owner)}</td>
+      <td><button class="btn-delete" title="Elimina">✖</button></td>
     `
+
     tbody.appendChild(tr)
   }
   status.textContent = `Righe: ${data.length}`
@@ -235,6 +237,26 @@ if (!u?.user) {
   status.textContent = 'Devi essere loggato per modificare.'
   return
 }
+
+
+  // DELETE row
+  tbody.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.btn-delete')
+    if (!btn) return
+    const tr = btn.closest('tr')
+    const id = tr.dataset.id
+    if (!id) return
+
+    if (!confirm('Vuoi davvero eliminare questa riga?')) return
+
+    const { error } = await sb.from('projects').delete().eq('id', id)
+    if (error) {
+      status.textContent = 'Errore eliminazione: ' + error.message
+    } else {
+      tr.remove()
+      status.textContent = 'Riga eliminata'
+    }
+  })
 
 
   // Meta colonna

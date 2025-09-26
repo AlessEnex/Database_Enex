@@ -29,3 +29,17 @@ td.editing { outline: 2px solid #1f6feb; }
   width: 100%; border: 1px solid #2a3646; border-radius: 8px;
   background: #0e1520; color: #e5e7eb; padding: 6px 8px;
 }
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 6px;
+  transition: color 0.2s;
+}
+
+.btn-delete:hover {
+  color: #c00;
+}
