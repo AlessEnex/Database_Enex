@@ -3,19 +3,6 @@ import { SUPABASE_URL, SUPABASE_KEY } from './config.js'
 
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY)
 
-
-// check session all'avvio e aggiorna UI
-(async () => {
-  const { data: { session } } = await sb.auth.getSession()
-  const logged = !!session?.user
-  loginBox.classList.toggle('hidden', logged)
-  btnToggleForm.classList.toggle('hidden', !logged)
-  btnLogout.classList.toggle('hidden', !logged)
-  userBadge.textContent = logged ? (session.user.email ?? 'utente') : ''
-})();
-
-
-
 // UI refs
 const tbody = document.querySelector('#tbl tbody')
 const status = document.getElementById('status')
@@ -61,7 +48,24 @@ const COLS = [
 function fmt(x){ return x ?? '' }
 function fmtDate(d){ return d ?? '' }
 
-// -------- READ
+// ---------- AUTH HELPERS
+function applySessionToUI(session) {
+  const logged = !!session?.user
+  loginBox.classList.toggle('hidden', logged)
+  btnToggleForm.classList.toggle('hidden', !logged)
+  btnLogout.classList.toggle('hidden', !logged)
+  userBadge.textContent = logged ? (session.user.email ?? 'utente') : ''
+}
+
+function redirectTarget() {
+  // Se su GitHub Pages → URL pubblico; se in locale → pagina corrente (Live Server)
+  const isGitHub = location.hostname.endsWith('github.io')
+  return isGitHub
+    ? 'https://alessenex.github.io/projects_app/'
+    : window.location.href
+}
+
+// ---------- READ
 async function load() {
   status.textContent = 'Carico…'
   const { data, error } = await sb
@@ -94,32 +98,44 @@ async function load() {
   status.textContent = `Righe: ${data.length}`
 }
 
-// -------- AUTH
+// ---------- AUTH
 btnLogin.onclick = async () => {
   const email = emailI.value
-  const redirectTo = 'https://alessenex.github.io/projects_app/'  // << fisso
   const { error } = await sb.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: redirectTo }
+    options: { emailRedirectTo: redirectTarget() }
   })
   loginMsg.textContent = error ? ('Errore: ' + error.message) : 'Link inviato ✅ controlla la mail.'
 }
 
-
-
-
-
-btnLogout.onclick = async () => { await sb.auth.signOut() }
+btnLogout.onclick = async () => {
+  await sb.auth.signOut()
+}
 
 sb.auth.onAuthStateChange(async (_event, session) => {
-  const logged = !!session?.user
-  loginBox.classList.toggle('hidden', logged)
-  btnToggleForm.classList.toggle('hidden', !logged)
-  btnLogout.classList.toggle('hidden', !logged)
-  userBadge.textContent = logged ? (session.user.email ?? 'utente') : ''
+  applySessionToUI(session)
+  // Dopo login/logout ricarico i dati per coerenza
+  load()
 })
 
-// -------- CREATE
+// Check session all’avvio + fallback PKCE (?code=...)
+;(async () => {
+  const params = new URLSearchParams(location.search)
+  const code = params.get('code')
+  if (code) {
+    try {
+      await sb.auth.exchangeCodeForSession(code)
+    } catch (_) { /* ignore */ }
+    // pulisci la query per evitare ricariche strane
+    history.replaceState(null, '', location.pathname + location.hash)
+  }
+
+  const { data: { session } } = await sb.auth.getSession()
+  applySessionToUI(session)
+  load()
+})()
+
+// ---------- CREATE
 btnToggleForm.onclick = () => { form.classList.toggle('hidden'); saveMsg.textContent = '' }
 btnCancel.onclick = () => { form.classList.add('hidden'); saveMsg.textContent = ''; form.reset() }
 
@@ -142,11 +158,17 @@ form.onsubmit = async (e) => {
   }
 
   const { error } = await sb.from('projects').insert(payload)
-  if (error) { saveMsg.textContent = 'Errore: ' + error.message }
-  else { saveMsg.textContent = 'Salvato ✅'; form.reset(); form.classList.add('hidden'); load() }
+  if (error) {
+    saveMsg.textContent = 'Errore: ' + error.message
+  } else {
+    saveMsg.textContent = 'Salvato ✅'
+    form.reset()
+    form.classList.add('hidden')
+    load()
+  }
 }
 
-// -------- INLINE EDIT
+// ---------- INLINE EDIT
 let editingCell = null
 
 tbody.addEventListener('click', async (e) => {
@@ -159,7 +181,7 @@ tbody.addEventListener('click', async (e) => {
   const col = td.dataset.col
   if (!id || !col) return
 
-  // Controllo permesso: puoi aggiornare solo se sei l'autore (policy RLS)
+  // Permesso: può aggiornare solo l'autore (RLS)
   const { data: u } = await sb.auth.getUser()
   const userId = u?.user?.id || null
   const createdBy = tr.dataset.createdBy || null
@@ -168,11 +190,11 @@ tbody.addEventListener('click', async (e) => {
     return
   }
 
-  // Trova meta colonna
+  // Meta colonna
   const meta = COLS.find(c => c.key === col)
   if (!meta) return
 
-  // Crea editor
+  // Editor
   const oldVal = td.textContent.trim()
   editingCell = td
   td.classList.add('editing')
@@ -198,9 +220,12 @@ tbody.addEventListener('click', async (e) => {
 
   const commit = async () => {
     const newValRaw = input.value.trim()
-    const newVal = (meta.type === 'date' && newValRaw === '') ? null : (meta.type === 'number' ? (newValRaw === '' ? null : Number(newValRaw)) : newValRaw)
+    const newVal = (meta.type === 'date' && newValRaw === '')
+      ? null
+      : (meta.type === 'number'
+          ? (newValRaw === '' ? null : Number(newValRaw))
+          : newValRaw)
 
-    // Se non cambia, annulla
     if (String(newVal ?? '') === String(oldVal ?? '')) {
       td.textContent = oldVal
       td.classList.remove('editing')
@@ -208,7 +233,6 @@ tbody.addEventListener('click', async (e) => {
       return
     }
 
-    // UPDATE
     const patch = {}
     patch[col] = newVal
     patch.updated_at = new Date().toISOString()
@@ -218,7 +242,6 @@ tbody.addEventListener('click', async (e) => {
       status.textContent = 'Errore salvataggio: ' + error.message
       td.textContent = oldVal // rollback UI
     } else {
-      // mostra valore formattato
       td.textContent = (meta.type === 'date') ? (newVal ?? '') : (newVal ?? '')
       status.textContent = 'Modifica salvata ✅'
     }
@@ -239,6 +262,5 @@ tbody.addEventListener('click', async (e) => {
   input.addEventListener('blur', commit)
 })
 
-// init
+// ---------- Controls
 btnReload.addEventListener('click', load)
-load()
