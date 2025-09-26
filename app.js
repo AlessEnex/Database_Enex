@@ -84,9 +84,15 @@ async function load() {
 // -------- AUTH
 btnLogin.onclick = async () => {
   const email = emailI.value
-  const { error } = await sb.auth.signInWithOtp({ email })
-  loginMsg.textContent = error ? ('Errore: ' + error.message) : 'Link di accesso inviato. Controlla la mail.'
+  const redirectTo = window.location.origin + '/projects_app/index.html'
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: redirectTo }
+  })
+  loginMsg.textContent = error ? ('Errore: ' + error.message) : 'Link inviato ✅ controlla la mail.'
 }
+
+
 
 btnLogout.onclick = async () => { await sb.auth.signOut() }
 
