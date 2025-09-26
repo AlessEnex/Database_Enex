@@ -113,7 +113,7 @@ btnLogin.onclick = async () => {
   })
   loginMsg.textContent = error
     ? ('Errore: ' + error.message)
-    : 'Link inviato ✅ (controlla la mail: puoi cliccare il link oppure usare il codice a 6 cifre qui sotto).'
+    : 'Link inviato (controlla la mail: puoi cliccare il link oppure usare il codice a 6 cifre qui sotto).'
 }
 
 
@@ -133,7 +133,7 @@ btnVerify.onclick = async () => {
   // aggiorna UI e dati
   const { data: { session } } = await sb.auth.getSession()
   applySessionToUI(session)
-  loginMsg.textContent = 'Accesso effettuato ✅'
+  loginMsg.textContent = 'Accesso effettuato'
   load()
 }
 
@@ -211,7 +211,7 @@ form.onsubmit = async (e) => {
   if (error) {
     saveMsg.textContent = 'Errore: ' + error.message
   } else {
-    saveMsg.textContent = 'Salvato ✅'
+    saveMsg.textContent = 'Salvato '
     form.reset()
     form.classList.add('hidden')
     load()
@@ -282,6 +282,7 @@ if (!u?.user) {
     if (meta.type === 'number') input.step = '1'
   }
 
+  
   td.innerHTML = ''
   td.appendChild(input)
   input.focus()
@@ -312,7 +313,7 @@ if (!u?.user) {
       td.textContent = oldVal // rollback UI
     } else {
       td.textContent = (meta.type === 'date') ? (newVal ?? '') : (newVal ?? '')
-      status.textContent = 'Modifica salvata ✅'
+      status.textContent = 'Modifica salvata'
     }
     td.classList.remove('editing')
     editingCell = null
@@ -333,3 +334,5 @@ if (!u?.user) {
 
 // ---------- Controls
 btnReload.addEventListener('click', load)
+
+

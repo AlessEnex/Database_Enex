@@ -25,10 +25,19 @@ textarea { min-height:90px; }
 
 
 td.editing { outline: 2px solid #1f6feb; }
+/* Input/Select inline edit dentro la tabella */
 .cell-input {
-  width: 100%; border: 1px solid #2a3646; border-radius: 8px;
-  background: #0e1520; color: #e5e7eb; padding: 6px 8px;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;         /* usa stesso font della cella */
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  height: 100%;
 }
+
 
 .btn-delete {
   background: none;
