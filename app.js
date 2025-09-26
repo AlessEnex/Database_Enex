@@ -16,6 +16,10 @@ const emailI = document.getElementById('email')
 const btnLogin = document.getElementById('btnLogin')
 const loginMsg = document.getElementById('loginMsg')
 
+const otpI = document.getElementById('otp')
+const btnVerify = document.getElementById('btnVerify')
+
+
 const form = document.getElementById('form')
 const saveMsg = document.getElementById('saveMsg')
 const btnCancel = document.getElementById('btnCancel')
@@ -98,16 +102,39 @@ async function load() {
   }
   status.textContent = `Righe: ${data.length}`
 }
-
 // ---------- AUTH
 btnLogin.onclick = async () => {
-  const email = emailI.value
+  const email = emailI.value.trim()
   const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: redirectTarget() }
   })
-  loginMsg.textContent = error ? ('Errore: ' + error.message) : 'Link inviato ✅ controlla la mail.'
+  loginMsg.textContent = error
+    ? ('Errore: ' + error.message)
+    : 'Link inviato ✅ (controlla la mail: puoi cliccare il link oppure usare il codice a 6 cifre qui sotto).'
 }
+
+
+// ⬇️ handler OTP separato (NON annidato)
+btnVerify.onclick = async () => {
+  const email = emailI.value.trim()
+  const token = otpI.value.trim()
+  if (!email || !token) {
+    loginMsg.textContent = 'Inserisci email e codice a 6 cifre'
+    return
+  }
+  const { error } = await sb.auth.verifyOtp({ email, token, type: 'email' })
+  if (error) {
+    loginMsg.textContent = 'Errore: ' + error.message
+    return
+  }
+  // aggiorna UI e dati
+  const { data: { session } } = await sb.auth.getSession()
+  applySessionToUI(session)
+  loginMsg.textContent = 'Accesso effettuato ✅'
+  load()
+}
+
 
 btnLogout.onclick = async () => {
   await sb.auth.signOut()

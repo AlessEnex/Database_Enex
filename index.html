@@ -12,15 +12,27 @@
 
     rev0.3
 
-    <!-- Login box -->
-    <div id="loginBox" class="card">
-      <p class="muted">Accedi con email (link magico). Serve per poter inserire/modificare.</p>
-      <div class="row-login">
-        <input id="email" type="email" placeholder="tu@esempio.com">
-        <button id="btnLogin">Invia link</button>
-      </div>
-      <p id="loginMsg" class="muted"></p>
-    </div>
+<!-- Login box -->
+<div id="loginBox" class="card">
+  <p class="muted">
+    Accedi con la tua email. Riceverai un link magico e un codice a 6 cifre (puoi usare uno dei due).
+  </p>
+
+  <!-- email + invia link -->
+  <div class="row-login">
+    <input id="email" type="email" placeholder="tu@esempio.com">
+    <button id="btnLogin">Invia link</button>
+  </div>
+
+  <!-- inserimento OTP -->
+  <div class="row-login" style="margin-top: 0.5rem;">
+    <input id="otp" inputmode="numeric" maxlength="6" placeholder="Codice 6 cifre">
+    <button id="btnVerify" type="button">Verifica codice</button>
+  </div>
+
+  <p id="loginMsg" class="muted"></p>
+</div>
+
 
     <!-- Toolbar -->
     <div class="toolbar">
