@@ -84,13 +84,14 @@ async function load() {
 // -------- AUTH
 btnLogin.onclick = async () => {
   const email = emailI.value
-  const redirectTo = window.location.href   // sempre la pagina corrente
+  const redirectTo = 'https://alessenex.github.io/projects_app/'  // << fisso
   const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: redirectTo }
   })
   loginMsg.textContent = error ? ('Errore: ' + error.message) : 'Link inviato ✅ controlla la mail.'
 }
+
 
 
 
