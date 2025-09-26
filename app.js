@@ -58,11 +58,12 @@ function applySessionToUI(session) {
 }
 
 function redirectTarget() {
-  // Se su GitHub Pages → URL pubblico; se in locale → pagina corrente (Live Server)
-  const isGitHub = location.hostname.endsWith('github.io')
-  return isGitHub
-    ? 'https://alessenex.github.io/projects_app/'
-    : window.location.href
+  // Funziona sia su GitHub Pages (qualsiasi repo path) sia in locale (Live Server)
+  const { origin, pathname } = window.location
+  const basePath = pathname.endsWith('/')
+    ? pathname
+    : pathname.slice(0, pathname.lastIndexOf('/') + 1)
+  return origin + basePath
 }
 
 // ---------- READ
