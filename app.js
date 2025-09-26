@@ -131,10 +131,30 @@ sb.auth.onAuthStateChange(async (_event, session) => {
     history.replaceState(null, '', location.pathname + location.hash)
   }
 
+
+
+  // 👉 aggiungi questa parte
+  if (location.hash.includes('access_token')) {
+    const hashParams = new URLSearchParams(location.hash.substring(1)) // rimuove "#"
+    const access_token = hashParams.get('access_token')
+    const refresh_token = hashParams.get('refresh_token')
+    if (access_token && refresh_token) {
+      await sb.auth.setSession({ access_token, refresh_token })
+      history.replaceState(null, '', location.pathname) // pulisce l’URL
+    }
+  }
+
+
+
   const { data: { session } } = await sb.auth.getSession()
   applySessionToUI(session)
   load()
 })()
+
+
+
+
+
 
 // ---------- CREATE
 btnToggleForm.onclick = () => { form.classList.toggle('hidden'); saveMsg.textContent = '' }
