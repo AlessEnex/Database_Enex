@@ -1,0 +1,2 @@
+export const SUPABASE_URL = 'https://imzuyobaofelbjekcbwr.supabase.co'
+export const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltenV5b2Jhb2ZlbGJqZWtjYndyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MDQ2MjAsImV4cCI6MjA3NDM4MDYyMH0.0NgMFB7qE5fUFRhINohSu3Sl1gKdcYpuEGvVpZ4YPgw'

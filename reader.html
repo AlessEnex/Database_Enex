@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8" />
+<title>Projects — Reader</title>
+<h1>Elenco commesse (solo lettura)</h1>
+<table id="tbl" border="1" cellpadding="6">
+  <thead>
+    <tr>
+      <th>Numero commessa</th>
+      <th>Anno</th>
+      <th>Nome commessa</th>
+      <th>JAM inviata</th>
+      <th>JAM confermata</th>
+      <th>Note</th>
+      <th>Ordini materiale</th>
+      <th>Owner</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  const SUPABASE_URL = 'https://imzuyobaofelbjekcbwr.supabase.co'
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltenV5b2Jhb2ZlbGJqZWtjYndyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4MDQ2MjAsImV4cCI6MjA3NDM4MDYyMH0.0NgMFB7qE5fUFRhINohSu3Sl1gKdcYpuEGvVpZ4YPgw'
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+  function fmt(d){ return d ?? '' }
+
+  async function load() {
+    const { data, error } = await sb
+      .from('projects')
+      .select('job_number, year, name, jam_sent, jam_confirmed, notes, material_orders, owner')
+      .order('created_at', { ascending: false })
+    if (error) { console.error(error); return }
+
+    const tbody = document.querySelector('#tbl tbody')
+    tbody.innerHTML = ''
+    for (const r of data) {
+      const tr = document.createElement('tr')
+      tr.innerHTML = `
+        <td>${fmt(r.job_number)}</td>
+        <td>${fmt(r.year)}</td>
+        <td>${fmt(r.name)}</td>
+        <td>${fmt(r.jam_sent)}</td>
+        <td>${fmt(r.jam_confirmed)}</td>
+        <td>${fmt(r.notes)}</td>
+        <td>${fmt(r.material_orders)}</td>
+        <td>${fmt(r.owner)}</td>
+      `
+      tbody.appendChild(tr)
+    }
+  }
+  load()
+</script>
+</html>

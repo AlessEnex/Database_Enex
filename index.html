@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <title>Commesse — Lettura & Scrittura</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <h1>Commesse</h1>
+
+    <!-- Login box -->
+    <div id="loginBox" class="card">
+      <p class="muted">Accedi con email (link magico). Serve per poter inserire/modificare.</p>
+      <div class="row-login">
+        <input id="email" type="email" placeholder="tu@esempio.com">
+        <button id="btnLogin">Invia link</button>
+      </div>
+      <p id="loginMsg" class="muted"></p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button id="btnReload">Ricarica</button>
+      <button id="btnToggleForm" class="hidden">Nuova riga</button>
+      <button id="btnLogout" class="hidden">Logout</button>
+      <span id="userBadge" class="muted"></span>
+    </div>
+
+    <!-- Form nuova riga -->
+    <form id="form" class="card hidden">
+      <div class="grid-two">
+        <div>
+          <label>Numero commessa</label>
+          <input id="job_number" required>
+        </div>
+        <div>
+          <label>Anno</label>
+          <input id="year" type="number" min="2000" max="2100" required>
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div>
+          <label>Nome commessa</label>
+          <input id="name" required>
+        </div>
+        <div>
+          <label>Owner</label>
+          <select id="owner" required>
+            <option value="">— scegli —</option>
+            <option>Piaser</option>
+            <option>Lazzarin</option>
+            <option>Reato</option>
+            <option>Mattiuzzo</option>
+            <option>Saccon</option>
+            <option>Savio</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div>
+          <label>JAM inviata</label>
+          <input id="jam_sent" type="date">
+        </div>
+        <div>
+          <label>JAM confermata</label>
+          <input id="jam_confirmed" type="date">
+        </div>
+      </div>
+
+      <div class="grid-two">
+        <div>
+          <label>Ordini materiale</label>
+          <input id="material_orders" type="date">
+        </div>
+        <div>
+          <label>Note</label>
+          <textarea id="notes" placeholder="Note…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">Salva</button>
+        <button type="button" id="btnCancel">Annulla</button>
+      </div>
+      <p id="saveMsg" class="muted"></p>
+    </form>
+
+    <!-- Tabella -->
+    <div class="table-wrap">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th>Numero commessa</th>
+            <th>Anno</th>
+            <th>Nome commessa</th>
+            <th>JAM inviata</th>
+            <th>JAM confermata</th>
+            <th>Note</th>
+            <th>Ordini materiale</th>
+            <th>Owner</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <p id="status" class="muted"></p>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
